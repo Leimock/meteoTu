@@ -1,9 +1,10 @@
 import "./style.css";
 
-document.getElementById("ciudad").addEventListener("change", obtainClimate);
+document.getElementById("ciudad").addEventListener("change", handleChangeCity);
 
-function obtainClimate() {
-  const city = document.querySelector("#ciudad").value;
+async function handleChangeCity(event) {
+  // event.preventDefault()
+  const city = event.target.value;
   const options = {
     method: 'GET',
     headers: {
@@ -12,16 +13,18 @@ function obtainClimate() {
     }
   };
   
-  fetch(`https://weatherapi-com.p.rapidapi.com/forecast.json?q=${city}&days=3`, options)
-    .then(response => response.json())
-    .then(response => {
-      console.log(response)
-      document.getElementById('tiempo').innerHTML = response.current.temp_c + 'ºC'
-      document.getElementById('sol').innerHTML = response.current.condition.text
-      document.getElementById('manhana').innerHTML = response.forecast.forecastday[1].day.avgtemp_c + 'ºC'
-      document.getElementById('tiempo1').innerHTML = response.forecast.forecastday[1].day.condition.text
-      document.getElementById('pasado').innerHTML = response.forecast.forecastday[2].day.avgtemp_c + 'ºC'
-      document.getElementById('tiempo2').innerHTML = response.forecast.forecastday[2].day.condition.text      
-    })
-    .catch(err => console.error(err));
+  const response = await fetch(`https://weatherapi-com.p.rapidapi.com/forecast.json?q=${city}&days=3`, options)
+  const data = await response.json()
+  console.log(data)
+  document.getElementById('tiempo').innerHTML = data.current.temp_c + 'ºC'
+  document.getElementById('sol').innerHTML = data.current.condition.text
+
+  document.getElementById('hoy').innerHTML = data.forecast.forecastday[0].day.avgtemp_c + 'ºC'
+  document.getElementById('tiempo0').innerHTML = data.forecast.forecastday[0].day.condition.text
+
+  document.getElementById('manhana').innerHTML = data.forecast.forecastday[1].day.avgtemp_c + 'ºC'
+  document.getElementById('tiempo1').innerHTML = data.forecast.forecastday[1].day.condition.text
+  
+  document.getElementById('pasado').innerHTML = data.forecast.forecastday[2].day.avgtemp_c + 'ºC'
+  document.getElementById('tiempo2').innerHTML = data.forecast.forecastday[2].day.condition.text      
 }
