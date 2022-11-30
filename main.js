@@ -7,11 +7,25 @@ if (cityStorage) {
 }
 
 document.getElementById("ciudad").addEventListener("change", handleChangeCity);
+document.getElementById("geo").addEventListener("click", handleChangeGeo);
 
 async function handleChangeCity(event) {
   const city = event.target.value;
   localStorage.setItem('city', city)
   getData(city)
+}
+
+function handleChangeGeo(event) {
+  if (!navigator.geolocation) {
+    console.log("No esta soportada la geolocación")
+    return
+  }
+
+  navigator.geolocation.getCurrentPosition(async position => {
+    const lat = position.coords.latitude
+    const lon = position.coords.longitude
+    getData(lat+","+lon)
+  })
 }
 
 async function getData(city) {
@@ -40,7 +54,7 @@ async function getData(city) {
   }
 }
 
-async function getForecastFromApi(city) {
+async function getForecastFromApi(location) {
   const options = {
     method: "GET",
     headers: {
@@ -50,9 +64,11 @@ async function getForecastFromApi(city) {
   };
 
   const response = await fetch(
-    `https://weatherapi-com.p.rapidapi.com/forecast.json?q=${city}&days=3`,
+    `https://weatherapi-com.p.rapidapi.com/forecast.json?q=${location}&days=3`,
     options
   );
   const data = await response.json();
+  document.getElementById('ciudad').value=data.location.name
   return data
 }
+
